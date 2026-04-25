@@ -62,31 +62,47 @@ func New() *Server {
 	}
 }
 
+// parses, and if a valid parse, directly updates s.docs. Doesnt return anything
+func (s *Server) scheduleParse(uri, text string) {
+	//check if a parse operation is running for the uri
+	s.mu.Lock()
+	if cancel, ok := s.parseCancels[uri]; ok {
+		cancel()
+	}
+
+	// once the delete operation is done from the parseCancels, we need to start a new parse
+	// calling cancel() causes ctx.Done() channel to close
+	ctx, cancel := context.WithCancel(context.Background())
+
+	// once the new cancel context is created, we need to add it to the list
+	// this is done, so that any event that comes, after this knows to cancel this call
+	s.parseCancels[uri] = cancel
+	s.mu.Unlock()
+
+	go func(ctx context.Context, uri, text string) {
+		doc := parser.ParseDocument(uri, text)
+		if ctx.Err() != nil {
+			return
+		}
+
+		// i.e, context is not cancelled, i.e, ctx.Err will be nil
+		// update docs
+		s.mu.Lock()
+		s.docs[uri] = doc
+		s.mu.Unlock()
+		// tell the editor about any errors found
+		s.publishDiagnostics(uri, doc)
+	}(ctx, uri, text)
+
+}
+
 func (s *Server) handleOpen(req *jsonrpc2.Request) error {
 	params := new(didOpenParams)
 	if err := json.Unmarshal(*req.Params, params); err != nil {
 		return err
 	}
 
-	doc := parser.ParseDocument(params.TextDocument.URI, params.TextDocument.Text)
-
-	s.mu.Lock()
-	s.docs[params.TextDocument.URI] = doc
-	s.mu.Unlock()
-
-	return nil
-}
-
-func (s *Server) handleClose(req *jsonrpc2.Request) error {
-	params := new(didCloseParams)
-	if err := json.Unmarshal(*req.Params, params); err != nil {
-		return err
-	}
-
-	s.mu.Lock()
-	delete(s.docs, params.TextDocument.URI)
-	s.mu.Unlock()
-
+	s.scheduleParse(params.TextDocument.URI, params.TextDocument.Text)
 	return nil
 }
 
@@ -100,13 +116,23 @@ func (s *Server) handleChange(req *jsonrpc2.Request) error {
 		return nil
 	}
 
-	doc := parser.ParseDocument(
-		params.TextDocument.URI,
-		params.ContentChanges[0].Text,
-	)
+	s.scheduleParse(params.TextDocument.URI, params.ContentChanges[0].Text)
+
+	return nil
+}
+
+func (s *Server) handleClose(req *jsonrpc2.Request) error {
+	params := new(didCloseParams)
+	if err := json.Unmarshal(*req.Params, params); err != nil {
+		return err
+	}
 
 	s.mu.Lock()
-	s.docs[params.TextDocument.URI] = doc
+	if cancel, ok := s.parseCancels[params.TextDocument.URI]; ok {
+		cancel()
+		delete(s.parseCancels, params.TextDocument.URI)
+	}
+	delete(s.docs, params.TextDocument.URI)
 	s.mu.Unlock()
 
 	return nil
