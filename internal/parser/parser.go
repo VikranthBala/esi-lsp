@@ -265,3 +265,28 @@ func (p *parser) tokenize(fragment string, baseOffset int) []*Node {
 
 	return roots
 }
+
+/*
+	1. Start at offset 0
+	2. Find next "<esi:" from current offset
+	3. If not found → done
+	4. Extract a balanced fragment from that position
+	5. Tokenize the fragment → get root nodes
+	6. Add root nodes to doc.Nodes
+	7. Advance offset past the fragment
+	8. Go to step 2
+*/
+
+func (p *parser) parse() {
+	offset := 0
+	for {
+		ind := p.findNext(offset, "<esi:")
+		if ind < 0 {
+			break
+		}
+		fragment, end := p.extractFragment(ind)
+		nodes := p.tokenize(fragment, ind)
+		p.doc.Nodes = append(p.doc.Nodes, nodes...)
+		offset = end
+	}
+}
