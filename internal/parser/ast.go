@@ -23,12 +23,13 @@ type Attribute struct {
 
 // represents one esi element
 type Node struct {
-	Kind      NodeKind
-	Range     Range
-	OpenRange Range // just the opening tag <esi:choose>
-	Attrs     []Attribute
-	Children  []*Node
-	Parent    *Node // nil if top level
+	Kind       NodeKind
+	Range      Range
+	OpenRange  Range // just the opening tag <esi:choose>
+	CloseRange Range
+	Attrs      []Attribute
+	Children   []*Node
+	Parent     *Node // nil if top level
 }
 
 type Document struct {

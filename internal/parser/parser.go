@@ -1,6 +1,7 @@
 package parser
 
 import (
+	"encoding/xml"
 	"sort"
 	"strings"
 )
@@ -126,4 +127,141 @@ func (p *parser) extractFragment(startOffset int) (string, int) {
 		Severity: 1,
 	})
 	return p.source[startOffset:], len(p.source)
+}
+
+// findNext finds the next occurrence of substr in p.source starting at from.
+// Returns the absolute offset, or -1 if not found.
+func (p *parser) findNext(from int, substr string) int {
+	idx := strings.Index(p.source[from:], substr)
+	if idx < 0 {
+		return -1
+	}
+	return from + idx
+}
+
+func (p *parser) buildAttrs(tagStart, tagEnd int, xmlAttrs []xml.Attr) []Attribute {
+	attrs := make([]Attribute, 0, len(xmlAttrs))
+	cursor := tagStart
+
+	for _, xmlAttr := range xmlAttrs {
+		name := xmlAttr.Name.Local
+		value := xmlAttr.Value
+
+		// find name= starting from cursor
+		nameStart := p.findNext(cursor, name)
+		if nameStart < 0 {
+			continue
+		}
+		nameEnd := nameStart + len(name)
+
+		// find =" just after the name, then skip past it
+		eqInd := p.findNext(nameEnd, `="`)
+		if eqInd < 0 {
+			continue
+		}
+		valStart := eqInd + 2 // skip ="
+		valEnd := valStart + len(value)
+
+		attrs = append(attrs, Attribute{
+			Name:       name,
+			Value:      value,
+			NameRange:  p.offsetToRange(nameStart, nameEnd),
+			ValueRange: p.offsetToRange(valStart, valEnd),
+		})
+
+		// advance cursor past this attribute so next search starts here
+		cursor = valEnd
+	}
+
+	return attrs
+}
+
+func (p *parser) tokenize(fragment string, baseOffset int) []*Node {
+	dec := xml.NewDecoder(strings.NewReader(fragment))
+	dec.Strict = false
+
+	var stack []*Node
+	var roots []*Node
+	cursor := baseOffset
+
+	for {
+		tok, err := dec.Token()
+		if err != nil {
+			break // EOF or error — either way we stop
+		}
+
+		switch t := tok.(type) {
+		case xml.StartElement:
+			if t.Name.Space != "esi" {
+				continue // ignore non-ESI tags inside fragment
+			}
+
+			kind, known := knownTags[t.Name.Local]
+			if !known {
+				// add a warning but still create a node
+				kind = NodeKind("esi:" + t.Name.Local)
+				p.doc.Errors = append(p.doc.Errors, ParseError{
+					Range:    p.offsetToRange(cursor, cursor+10),
+					Message:  "unknown ESI tag: esi:" + t.Name.Local,
+					Severity: 2,
+				})
+			}
+
+			// find this tag's position in source
+			tagStart := p.findNext(cursor, "<esi:"+t.Name.Local)
+			tagEnd := p.findNext(tagStart, ">") + 1
+
+			node := &Node{
+				Kind:      kind,
+				OpenRange: p.offsetToRange(tagStart, tagEnd),
+				Range:     p.offsetToRange(tagStart, tagEnd),
+			}
+
+			// build attrs — your turn to fill this in
+			node.Attrs = p.buildAttrs(tagStart, tagEnd, t.Attr)
+
+			// wire up parent/child relationship
+			if len(stack) > 0 {
+				parent := stack[len(stack)-1]
+				node.Parent = parent
+				parent.Children = append(parent.Children, node)
+			}
+
+			// add to flat list
+			p.doc.All = append(p.doc.All, node)
+
+			stack = append(stack, node)
+			cursor = tagEnd
+
+		case xml.EndElement:
+			if t.Name.Space != "esi" {
+				continue
+			}
+			if len(stack) == 0 {
+				continue
+			}
+
+			node := stack[len(stack)-1]
+			stack = stack[:len(stack)-1]
+
+			// find closing tag position
+			closeStart := p.findNext(cursor, "</esi:"+t.Name.Local)
+			closeEnd := p.findNext(closeStart, ">") + 1
+
+			node.CloseRange = p.offsetToRange(closeStart, closeEnd)
+			node.Range = Range{
+				Start: node.OpenRange.Start,
+				End:   node.CloseRange.End,
+			}
+
+			cursor = closeEnd
+
+			// if stack is empty, this is a root node
+			if len(stack) == 0 {
+				roots = append(roots, node)
+			}
+		}
+	}
+
+	return roots
 }
