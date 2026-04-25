@@ -88,7 +88,7 @@ func (p *parser) extractFragment(startOffset int) (string, int) {
 		relEnd := strings.IndexByte(p.source[i:], '>')
 		if relEnd < 0 {
 			// no closing '>' — malformed, add parse error and bail
-			p.doc.Errors = append(p.doc.Errors, ParseError{
+			p.doc.Errors = append(p.doc.Errors, Diagnostic{
 				Range:    p.offsetToRange(i, i+1),
 				Message:  "unclosed tag",
 				Severity: 1,
@@ -121,7 +121,7 @@ func (p *parser) extractFragment(startOffset int) (string, int) {
 	}
 
 	// reached end of source without closing — unclosed tag error
-	p.doc.Errors = append(p.doc.Errors, ParseError{
+	p.doc.Errors = append(p.doc.Errors, Diagnostic{
 		Range:    p.offsetToRange(startOffset, len(p.source)),
 		Message:  "unclosed ESI tag",
 		Severity: 1,
@@ -200,7 +200,7 @@ func (p *parser) tokenize(fragment string, baseOffset int) []*Node {
 			if !known {
 				// add a warning but still create a node
 				kind = NodeKind("esi:" + t.Name.Local)
-				p.doc.Errors = append(p.doc.Errors, ParseError{
+				p.doc.Errors = append(p.doc.Errors, Diagnostic{
 					Range:    p.offsetToRange(cursor, cursor+10),
 					Message:  "unknown ESI tag: esi:" + t.Name.Local,
 					Severity: 2,

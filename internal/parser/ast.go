@@ -36,10 +36,10 @@ type Document struct {
 	URI    string
 	Nodes  []*Node // top level nodes only
 	All    []*Node // every node, flat list — for easy searching
-	Errors []ParseError
+	Errors []Diagnostic
 }
 
-type ParseError struct {
+type Diagnostic struct {
 	Range    Range
 	Message  string
 	Severity int // 1= error, 2=warning, 3=info

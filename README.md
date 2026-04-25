@@ -100,3 +100,8 @@ launches it as a child process and connects as an LSP client.
 ## License
 
 MIT
+
+
+NOTE:
+
+ONLY short form of tags are supported
