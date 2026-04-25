@@ -138,12 +138,33 @@ func (s *Server) handleClose(req *jsonrpc2.Request) error {
 	return nil
 }
 
+// this is called, when the client looks at the server, and sends it, its capabilities,
+// and expectes server to do the same, based on servers response, it will let the server know based on the capability
+func (s *Server) handleInitialize(req *jsonrpc2.Request) (any, error) {
+
+	// for now returing the server capabilities directly
+
+	return map[string]any{
+		"capabilities": map[string]any{
+			"textDocumentSync": 1, // always send the whole document, when any change happens, use 2, for incremental changes
+			// registers us as a completion provider.
+			// triggerCharacters tells the editor which characters should automatically pop open the completion menu without the user
+			// pressing Ctrl+Space. We want < (starting a tag), : (after esi), and space (inside a tag, offering attributes).
+			"completionProvider": map[string][]string{
+				"triggerCharacters": []string{"<", ":", " "},
+			},
+			"hoverProvider":      true, // says server has the capabitilty to serve hover notification
+			"definitionProvider": true, // says server has the capabitilty to serve definition notification
+		},
+	}, nil
+}
+
 func (s *Server) handle(ctx context.Context, conn *jsonrpc2.Conn, req *jsonrpc2.Request) (any, error) {
 	log.Printf("<-%s", req.Method)
 
 	switch req.Method {
 	case "initialize":
-		return s.handleInitalize(req)
+		return s.handleInitialize(req)
 	case "initialized", "shutdown":
 		return nil, nil
 	case "exit":
