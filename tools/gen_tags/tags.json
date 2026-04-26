@@ -1,0 +1,133 @@
+{
+  "esi:include": {
+    "tag": "esi:include",
+    "summary": "Statement to include external objects",
+    "requiredAttrs": ["src"],
+    "allowedAttrs": ["alt", "dcab", "onerror", "maxwait", "ttl"],
+    "attrDocs": {
+      "src": "primary object to fetch",
+      "alt": "object to fetch if src not found",
+      "dcab": "type of processing for object",
+      "onerror": "ignores failed fetches and continues serving the page",
+      "maxwait": "time-out period for EdgeSuite to wait for fetch",
+      "ttl": "caching duration"
+    }
+  },
+  "esi:comment": {
+    "tag": "esi:comment",
+    "summary": "Adds commentary within ESI blocks",
+    "requiredAttrs": [],
+    "allowedAttrs": ["text"],
+    "attrDocs": {
+      "text": "Comment text"
+    }
+  },
+  "esi:vars": {
+    "tag": "esi:vars",
+    "summary": "Define and evaluate variables within a fragment",
+    "requiredAttrs": [],
+    "allowedAttrs": ["cid", "alt"],
+    "attrDocs": {
+      "cid": "EdgeSuite identifier",
+      "alt": "Specify alternative object if src object cannot be fetched"
+    }
+  },
+  "esi:assign": {
+    "tag": "esi:assign",
+    "summary": "Assigns a value to a user-defined variable",
+    "requiredAttrs": ["name", "value"],
+    "allowedAttrs": ["name", "value"],
+    "attrDocs": {
+      "name": "Variable name to assign to",
+      "value": "Value to assign"
+    }
+  },
+  "esi:eval": {
+    "tag": "esi:eval",
+    "summary": "Evaluates another ESI page inline at processing time",
+    "requiredAttrs": [],
+    "allowedAttrs": ["src", "maxwait"],
+    "attrDocs": {
+      "src": "URL of the ESI page to evaluate",
+      "maxwait": "Timeout in milliseconds"
+    }
+  },
+  "esi:choose": {
+    "tag": "esi:choose",
+    "summary": "Conditional resource selection",
+    "requiredAttrs": [],
+    "allowedAttrs": []
+  },
+  "esi:when": {
+    "tag": "esi:when",
+    "summary": "Conditional content based on Boolean expression",
+    "requiredAttrs": ["test"],
+    "allowedAttrs": ["test"],
+    "attrDocs": {
+      "test": "Boolean expression"
+    }
+  },
+  "esi:otherwise": {
+    "tag": "esi:otherwise",
+    "summary": "Evaluates content if all when conditions are false",
+    "requiredAttrs": [],
+    "allowedAttrs": [],
+    "attrDocs": {}
+  },
+  "esi:try": {
+    "tag": "esi:try",
+    "summary": "Error handling container, wraps esi:attempt and esi:except",
+    "requiredAttrs": [],
+    "allowedAttrs": [],
+    "attrDocs": {}
+  },
+  "esi:attempt": {
+    "tag": "esi:attempt",
+    "summary": "Primary branch within esi:try, content to attempt first",
+    "requiredAttrs": [],
+    "allowedAttrs": [],
+    "attrDocs": {}
+  },
+  "esi:except": {
+    "tag": "esi:except",
+    "summary": "Execute alternative content if ESI attempt fails",
+    "requiredAttrs": [],
+    "allowedAttrs": [],
+    "attrDocs": {}
+  },
+  "esi:function": {
+    "tag": "esi:function",
+    "summary": "Function block for returning values",
+    "requiredAttrs": ["return"],
+    "allowedAttrs": ["return"],
+    "attrDocs": {
+      "return": "Value to be returned"
+    }
+  },
+  "esi:text": {
+    "tag": "esi:text",
+    "summary": "Inserts flat text without ESI processing",
+    "requiredAttrs": [],
+    "allowedAttrs": ["src"],
+    "attrDocs": {
+      "src": "URL of the fragment"
+    }
+  },
+  "esi:remove": {
+    "tag": "esi:remove",
+    "summary": "Removes content block at ESI processing time",
+    "requiredAttrs": [],
+    "allowedAttrs": [],
+    "attrDocs": {}
+  },
+  "esi:inline": {
+    "tag": "esi:inline",
+    "summary": "Defines an inline ESI fragment that can be included by name",
+    "requiredAttrs": ["name", "fetchable"],
+    "allowedAttrs": ["name", "fetchable"],
+    "attrDocs": {
+      "name": "Name of the inline fragment",
+      "fetchable": "Whether the fragment can be fetched independently"
+    }
+  }
+}

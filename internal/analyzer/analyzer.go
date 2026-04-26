@@ -11,84 +11,8 @@ type tagMeta struct {
 	requiredAttrs []string
 	allowedAttrs  []string
 	validParents  []parser.NodeKind // empty means "any parent or no parent is fine"
-}
-
-var tagRules = map[parser.NodeKind]tagMeta{
-	"esi:include": {
-		requiredAttrs: []string{"src"},
-		allowedAttrs:  []string{"src", "alt", "onerror", "maxwait", "ttl"},
-		validParents:  []parser.NodeKind{},
-	},
-	"esi:remove": {
-		requiredAttrs: []string{},
-		allowedAttrs:  []string{},
-		validParents:  []parser.NodeKind{},
-	},
-	"esi:comment": {
-		requiredAttrs: []string{"text"},
-		allowedAttrs:  []string{"text"},
-		validParents:  []parser.NodeKind{},
-	},
-	"esi:vars": {
-		requiredAttrs: []string{},
-		allowedAttrs:  []string{"name"},
-		validParents:  []parser.NodeKind{},
-	},
-	"esi:assign": {
-		requiredAttrs: []string{"name", "value"},
-		allowedAttrs:  []string{"name", "value"},
-		validParents:  []parser.NodeKind{},
-	},
-	"esi:eval": {
-		requiredAttrs: []string{},
-		allowedAttrs:  []string{"src", "maxwait"},
-		validParents:  []parser.NodeKind{},
-	},
-	"esi:choose": {
-		requiredAttrs: []string{},
-		allowedAttrs:  []string{},
-		validParents:  []parser.NodeKind{},
-	},
-	"esi:when": {
-		requiredAttrs: []string{"test"},
-		allowedAttrs:  []string{"test"},
-		validParents:  []parser.NodeKind{"esi:choose"},
-	},
-	"esi:otherwise": {
-		requiredAttrs: []string{},
-		allowedAttrs:  []string{},
-		validParents:  []parser.NodeKind{"esi:choose"},
-	},
-	"esi:try": {
-		requiredAttrs: []string{},
-		allowedAttrs:  []string{},
-		validParents:  []parser.NodeKind{},
-	},
-	"esi:attempt": {
-		requiredAttrs: []string{},
-		allowedAttrs:  []string{},
-		validParents:  []parser.NodeKind{"esi:try"},
-	},
-	"esi:except": {
-		requiredAttrs: []string{},
-		allowedAttrs:  []string{},
-		validParents:  []parser.NodeKind{"esi:try"},
-	},
-	"esi:inline": {
-		requiredAttrs: []string{"name", "fetchable"},
-		allowedAttrs:  []string{"name", "fetchable"},
-		validParents:  []parser.NodeKind{},
-	},
-	"esi:function": {
-		requiredAttrs: []string{"name"},
-		allowedAttrs:  []string{"name"},
-		validParents:  []parser.NodeKind{},
-	},
-	"esi:text": {
-		requiredAttrs: []string{},
-		allowedAttrs:  []string{},
-		validParents:  []parser.NodeKind{},
-	},
+	summary       string
+	attrDocs      map[string]string
 }
 
 func Analyze(doc *parser.Document) []parser.Diagnostic {
