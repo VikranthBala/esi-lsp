@@ -36,7 +36,7 @@ func main() {
 	fmt.Println(`import "github.com/vikranthBala/esi-lsp/internal/parser"`)
 	fmt.Println()
 
-	fmt.Println("var tagRules = map[parser.NodeKind]tagMeta{")
+	fmt.Println("var TagRules = map[parser.NodeKind]TagMeta{")
 
 	keys := make([]string, 0, len(tags))
 	for k := range tags {

@@ -5,7 +5,7 @@ package analyzer
 
 import "github.com/vikranthBala/esi-lsp/internal/parser"
 
-var tagRules = map[parser.NodeKind]tagMeta{
+var TagRules = map[parser.NodeKind]TagMeta{
 	"esi:assign": {
 		requiredAttrs: []string{"name", "value"},
 		allowedAttrs:  []string{"name", "value"},

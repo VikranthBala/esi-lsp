@@ -7,7 +7,7 @@ import (
 	"github.com/vikranthBala/esi-lsp/internal/parser"
 )
 
-type tagMeta struct {
+type TagMeta struct {
 	requiredAttrs []string
 	allowedAttrs  []string
 	validParents  []parser.NodeKind // empty means "any parent or no parent is fine"
@@ -29,7 +29,7 @@ func Analyze(doc *parser.Document) []parser.Diagnostic {
 }
 
 func checkRequiredAttrs(node *parser.Node) []parser.Diagnostic {
-	nodeAttrs, known := tagRules[node.Kind]
+	nodeAttrs, known := TagRules[node.Kind]
 	if !known {
 		return nil
 	}
@@ -56,7 +56,7 @@ func checkRequiredAttrs(node *parser.Node) []parser.Diagnostic {
 }
 
 func checkUnknownAttrs(node *parser.Node) []parser.Diagnostic {
-	nodeAttrs, known := tagRules[node.Kind]
+	nodeAttrs, known := TagRules[node.Kind]
 	if !known {
 		return nil
 	}
@@ -78,7 +78,7 @@ func checkUnknownAttrs(node *parser.Node) []parser.Diagnostic {
 }
 
 func checkNesting(node *parser.Node) []parser.Diagnostic {
-	meta, known := tagRules[node.Kind]
+	meta, known := TagRules[node.Kind]
 	if !known || len(meta.validParents) == 0 {
 		return nil
 	}
