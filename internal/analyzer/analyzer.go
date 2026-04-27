@@ -8,11 +8,11 @@ import (
 )
 
 type TagMeta struct {
-	requiredAttrs []string
-	allowedAttrs  []string
-	validParents  []parser.NodeKind // empty means "any parent or no parent is fine"
-	summary       string
-	attrDocs      map[string]string
+	RequiredAttrs []string
+	AllowedAttrs  []string
+	ValidParents  []parser.NodeKind // empty means "any parent or no parent is fine"
+	Summary       string
+	AttrDocs      map[string]string
 }
 
 func Analyze(doc *parser.Document) []parser.Diagnostic {
@@ -37,7 +37,7 @@ func checkRequiredAttrs(node *parser.Node) []parser.Diagnostic {
 	result := make([]parser.Diagnostic, 0)
 
 	// first check required attributes
-	for _, req := range nodeAttrs.requiredAttrs {
+	for _, req := range nodeAttrs.RequiredAttrs {
 		found := false
 		for _, attr := range node.Attrs {
 			if attr.Name == req {
@@ -65,7 +65,7 @@ func checkUnknownAttrs(node *parser.Node) []parser.Diagnostic {
 
 	// first check required attributes
 	for _, attr := range node.Attrs {
-		ok := slices.Contains(nodeAttrs.allowedAttrs, attr.Name)
+		ok := slices.Contains(nodeAttrs.AllowedAttrs, attr.Name)
 		if !ok {
 			result = append(result, parser.Diagnostic{
 				Range:    attr.NameRange,
@@ -79,22 +79,22 @@ func checkUnknownAttrs(node *parser.Node) []parser.Diagnostic {
 
 func checkNesting(node *parser.Node) []parser.Diagnostic {
 	meta, known := TagRules[node.Kind]
-	if !known || len(meta.validParents) == 0 {
+	if !known || len(meta.ValidParents) == 0 {
 		return nil
 	}
 
 	if node.Parent == nil {
 		return []parser.Diagnostic{{
 			Range:    node.OpenRange,
-			Message:  fmt.Sprintf("%s must be inside %v", node.Kind, meta.validParents),
+			Message:  fmt.Sprintf("%s must be inside %v", node.Kind, meta.ValidParents),
 			Severity: 1,
 		}}
 	}
 
-	if !slices.Contains(meta.validParents, node.Parent.Kind) {
+	if !slices.Contains(meta.ValidParents, node.Parent.Kind) {
 		return []parser.Diagnostic{{
 			Range:    node.OpenRange,
-			Message:  fmt.Sprintf("%s must be inside %v, found inside %s", node.Kind, meta.validParents, node.Parent.Kind),
+			Message:  fmt.Sprintf("%s must be inside %v, found inside %s", node.Kind, meta.ValidParents, node.Parent.Kind),
 			Severity: 1,
 		}}
 	}

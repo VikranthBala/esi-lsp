@@ -7,62 +7,62 @@ import "github.com/vikranthBala/esi-lsp/internal/parser"
 
 var TagRules = map[parser.NodeKind]TagMeta{
 	"esi:assign": {
-		requiredAttrs: []string{"name", "value"},
-		allowedAttrs:  []string{"name", "value"},
-		summary:       "Assigns a value to a user-defined variable",
-		attrDocs: map[string]string{
+		RequiredAttrs: []string{"name", "value"},
+		AllowedAttrs:  []string{"name", "value"},
+		Summary:       "Assigns a value to a user-defined variable",
+		AttrDocs: map[string]string{
 			"name":  "Variable name to assign to",
 			"value": "Value to assign",
 		},
 	},
 	"esi:attempt": {
-		requiredAttrs: []string{},
-		allowedAttrs:  []string{},
-		summary:       "Primary branch within esi:try, content to attempt first",
-		attrDocs:      map[string]string{},
+		RequiredAttrs: []string{},
+		AllowedAttrs:  []string{},
+		Summary:       "Primary branch within esi:try, content to attempt first",
+		AttrDocs:      map[string]string{},
 	},
 	"esi:choose": {
-		requiredAttrs: []string{},
-		allowedAttrs:  []string{},
-		summary:       "Conditional resource selection",
-		attrDocs:      map[string]string{},
+		RequiredAttrs: []string{},
+		AllowedAttrs:  []string{},
+		Summary:       "Conditional resource selection",
+		AttrDocs:      map[string]string{},
 	},
 	"esi:comment": {
-		requiredAttrs: []string{},
-		allowedAttrs:  []string{"text"},
-		summary:       "Adds commentary within ESI blocks",
-		attrDocs: map[string]string{
+		RequiredAttrs: []string{},
+		AllowedAttrs:  []string{"text"},
+		Summary:       "Adds commentary within ESI blocks",
+		AttrDocs: map[string]string{
 			"text": "Comment text",
 		},
 	},
 	"esi:eval": {
-		requiredAttrs: []string{},
-		allowedAttrs:  []string{"src", "maxwait"},
-		summary:       "Evaluates another ESI page inline at processing time",
-		attrDocs: map[string]string{
+		RequiredAttrs: []string{},
+		AllowedAttrs:  []string{"src", "maxwait"},
+		Summary:       "Evaluates another ESI page inline at processing time",
+		AttrDocs: map[string]string{
 			"src":     "URL of the ESI page to evaluate",
 			"maxwait": "Timeout in milliseconds",
 		},
 	},
 	"esi:except": {
-		requiredAttrs: []string{},
-		allowedAttrs:  []string{},
-		summary:       "Execute alternative content if ESI attempt fails",
-		attrDocs:      map[string]string{},
+		RequiredAttrs: []string{},
+		AllowedAttrs:  []string{},
+		Summary:       "Execute alternative content if ESI attempt fails",
+		AttrDocs:      map[string]string{},
 	},
 	"esi:function": {
-		requiredAttrs: []string{"return"},
-		allowedAttrs:  []string{"return"},
-		summary:       "Function block for returning values",
-		attrDocs: map[string]string{
+		RequiredAttrs: []string{"return"},
+		AllowedAttrs:  []string{"return"},
+		Summary:       "Function block for returning values",
+		AttrDocs: map[string]string{
 			"return": "Value to be returned",
 		},
 	},
 	"esi:include": {
-		requiredAttrs: []string{"src"},
-		allowedAttrs:  []string{"alt", "dcab", "onerror", "maxwait", "ttl"},
-		summary:       "Statement to include external objects",
-		attrDocs: map[string]string{
+		RequiredAttrs: []string{"src"},
+		AllowedAttrs:  []string{"alt", "dcab", "onerror", "maxwait", "ttl"},
+		Summary:       "Statement to include external objects",
+		AttrDocs: map[string]string{
 			"src":     "primary object to fetch",
 			"alt":     "object to fetch if src not found",
 			"dcab":    "type of processing for object",
@@ -72,54 +72,54 @@ var TagRules = map[parser.NodeKind]TagMeta{
 		},
 	},
 	"esi:inline": {
-		requiredAttrs: []string{"name", "fetchable"},
-		allowedAttrs:  []string{"name", "fetchable"},
-		summary:       "Defines an inline ESI fragment that can be included by name",
-		attrDocs: map[string]string{
+		RequiredAttrs: []string{"name", "fetchable"},
+		AllowedAttrs:  []string{"name", "fetchable"},
+		Summary:       "Defines an inline ESI fragment that can be included by name",
+		AttrDocs: map[string]string{
 			"name":      "Name of the inline fragment",
 			"fetchable": "Whether the fragment can be fetched independently",
 		},
 	},
 	"esi:otherwise": {
-		requiredAttrs: []string{},
-		allowedAttrs:  []string{},
-		summary:       "Evaluates content if all when conditions are false",
-		attrDocs:      map[string]string{},
+		RequiredAttrs: []string{},
+		AllowedAttrs:  []string{},
+		Summary:       "Evaluates content if all when conditions are false",
+		AttrDocs:      map[string]string{},
 	},
 	"esi:remove": {
-		requiredAttrs: []string{},
-		allowedAttrs:  []string{},
-		summary:       "Removes content block at ESI processing time",
-		attrDocs:      map[string]string{},
+		RequiredAttrs: []string{},
+		AllowedAttrs:  []string{},
+		Summary:       "Removes content block at ESI processing time",
+		AttrDocs:      map[string]string{},
 	},
 	"esi:text": {
-		requiredAttrs: []string{},
-		allowedAttrs:  []string{"src"},
-		summary:       "Inserts flat text without ESI processing",
-		attrDocs: map[string]string{
+		RequiredAttrs: []string{},
+		AllowedAttrs:  []string{"src"},
+		Summary:       "Inserts flat text without ESI processing",
+		AttrDocs: map[string]string{
 			"src": "URL of the fragment",
 		},
 	},
 	"esi:try": {
-		requiredAttrs: []string{},
-		allowedAttrs:  []string{},
-		summary:       "Error handling container, wraps esi:attempt and esi:except",
-		attrDocs:      map[string]string{},
+		RequiredAttrs: []string{},
+		AllowedAttrs:  []string{},
+		Summary:       "Error handling container, wraps esi:attempt and esi:except",
+		AttrDocs:      map[string]string{},
 	},
 	"esi:vars": {
-		requiredAttrs: []string{},
-		allowedAttrs:  []string{"cid", "alt"},
-		summary:       "Define and evaluate variables within a fragment",
-		attrDocs: map[string]string{
+		RequiredAttrs: []string{},
+		AllowedAttrs:  []string{"cid", "alt"},
+		Summary:       "Define and evaluate variables within a fragment",
+		AttrDocs: map[string]string{
 			"cid": "EdgeSuite identifier",
 			"alt": "Specify alternative object if src object cannot be fetched",
 		},
 	},
 	"esi:when": {
-		requiredAttrs: []string{"test"},
-		allowedAttrs:  []string{"test"},
-		summary:       "Conditional content based on Boolean expression",
-		attrDocs: map[string]string{
+		RequiredAttrs: []string{"test"},
+		AllowedAttrs:  []string{"test"},
+		Summary:       "Conditional content based on Boolean expression",
+		AttrDocs: map[string]string{
 			"test": "Boolean expression",
 		},
 	},

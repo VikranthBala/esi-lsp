@@ -48,11 +48,11 @@ func main() {
 		v := tags[k]
 		fmt.Printf("\t%q: {\n", k)
 
-		fmt.Printf("\t\trequiredAttrs: %#v,\n", v.RequiredAttrs)
-		fmt.Printf("\t\tallowedAttrs: %#v,\n", v.AllowedAttrs)
-		fmt.Printf("\t\tsummary: %q,\n", v.Summary)
+		fmt.Printf("\t\tRequiredAttrs: %#v,\n", v.RequiredAttrs)
+		fmt.Printf("\t\tAllowedAttrs: %#v,\n", v.AllowedAttrs)
+		fmt.Printf("\t\tSummary: %q,\n", v.Summary)
 
-		fmt.Println("\t\tattrDocs: map[string]string{")
+		fmt.Println("\t\tAttrDocs: map[string]string{")
 		for ak, av := range v.AttrDocs {
 			fmt.Printf("\t\t\t%q: %q,\n", ak, strings.TrimSpace(av))
 		}
