@@ -8,6 +8,10 @@ import (
 	"sync"
 
 	"github.com/sourcegraph/jsonrpc2"
+	"github.com/vikranthBala/esi-lsp/internal/analyzer"
+	"github.com/vikranthBala/esi-lsp/internal/completion"
+	"github.com/vikranthBala/esi-lsp/internal/definition"
+	"github.com/vikranthBala/esi-lsp/internal/hover"
 	"github.com/vikranthBala/esi-lsp/internal/parser"
 )
 
@@ -44,6 +48,16 @@ type didCloseParams struct {
 	} `json:"textDocument"`
 }
 
+type positionParams struct {
+	TextDocument struct {
+		URI string `json:"uri"`
+	} `json:"textDocument"`
+	Position struct {
+		Line      int `json:"line"`
+		Character int `json:"character"`
+	} `json:"position"`
+}
+
 type Server struct {
 	mu   sync.RWMutex
 	docs map[string]*parser.Document
@@ -59,6 +73,38 @@ func New() *Server {
 	return &Server{
 		docs:         make(map[string]*parser.Document),
 		parseCancels: make(map[string]context.CancelFunc),
+	}
+}
+
+func (s *Server) publishDiagnostics(uri string, doc *parser.Document) {
+	diags := analyzer.Analyze(doc)
+
+	lspDiags := make([]map[string]any, 0, len(diags))
+	for _, d := range diags {
+		lspDiags = append(lspDiags, map[string]any{
+			"range":    lspRange(d.Range),
+			"severity": d.Severity,
+			"source":   "akamai-esi-lsp",
+			"message":  d.Message,
+		})
+	}
+
+	_ = s.conn.Notify(context.Background(), "textDocument/publishDiagnostics", map[string]any{
+		"uri":         uri,
+		"diagnostics": lspDiags,
+	})
+}
+
+func lspRange(r parser.Range) map[string]any {
+	return map[string]any{
+		"start": map[string]any{
+			"line":      r.Start.Line,
+			"character": r.Start.Character,
+		},
+		"end": map[string]any{
+			"line":      r.End.Line,
+			"character": r.End.Character,
+		},
 	}
 }
 
@@ -138,6 +184,60 @@ func (s *Server) handleClose(req *jsonrpc2.Request) error {
 	return nil
 }
 
+func (s *Server) handleHover(req *jsonrpc2.Request) (any, error) {
+	params := new(positionParams)
+	if err := json.Unmarshal(*req.Params, params); err != nil {
+		return nil, err
+	}
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	doc := s.docs[params.TextDocument.URI]
+	if doc == nil {
+		return nil, nil
+	}
+	result := hover.Hover(doc, parser.Position{
+		Line:      params.Position.Line,
+		Character: params.Position.Character,
+	})
+	return result, nil
+}
+
+func (s *Server) handleCompletion(req *jsonrpc2.Request) (any, error) {
+	params := new(positionParams)
+	if err := json.Unmarshal(*req.Params, params); err != nil {
+		return nil, err
+	}
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	doc := s.docs[params.TextDocument.URI]
+	if doc == nil {
+		return nil, nil
+	}
+	result := completion.Complete(doc, parser.Position{
+		Line:      params.Position.Line,
+		Character: params.Position.Character,
+	})
+	return result, nil
+}
+
+func (s *Server) handleDefinition(req *jsonrpc2.Request) (any, error) {
+	params := new(positionParams)
+	if err := json.Unmarshal(*req.Params, params); err != nil {
+		return nil, err
+	}
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	doc := s.docs[params.TextDocument.URI]
+	if doc == nil {
+		return nil, nil
+	}
+	result := definition.Definition(doc, parser.Position{
+		Line:      params.Position.Line,
+		Character: params.Position.Character,
+	})
+	return result, nil
+}
+
 // this is called, when the client looks at the server, and sends it, its capabilities,
 // and expectes server to do the same, based on servers response, it will let the server know based on the capability
 func (s *Server) handleInitialize(req *jsonrpc2.Request) (any, error) {
@@ -177,6 +277,13 @@ func (s *Server) handle(ctx context.Context, conn *jsonrpc2.Conn, req *jsonrpc2.
 		return nil, s.handleChange(req)
 	case "textDocument/didClose":
 		return nil, s.handleClose(req)
+
+	case "textDocument/hover":
+		return s.handleHover(req)
+	case "textDocument/completion":
+		return s.handleCompletion(req)
+	case "textDocument/definition":
+		return s.handleDefinition(req)
 
 	default:
 		return nil, nil
