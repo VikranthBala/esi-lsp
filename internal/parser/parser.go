@@ -46,7 +46,7 @@ func ParseDocument(uri, source string) *Document {
 		uri:       uri,
 		source:    source,
 		lineIndex: buildLineIndex(source),
-		doc:       &Document{URI: uri},
+		doc:       &Document{URI: uri, Source: source},
 	}
 	p.parse()
 	return p.doc
@@ -59,9 +59,7 @@ func (p *parser) offsetToPosition(offset int) Position {
 	}) - 1 // step back — that's the line containing offset
 
 	// guard: offset before any newline, or sort.Search returns 0
-	if line < 0 {
-		line = 0
-	}
+	line = max(line, 0)
 
 	return Position{Line: line, Character: offset - p.lineIndex[line]}
 }

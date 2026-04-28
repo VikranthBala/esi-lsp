@@ -34,6 +34,7 @@ type Node struct {
 
 type Document struct {
 	URI    string
+	Source string
 	Nodes  []*Node // top level nodes only
 	All    []*Node // every node, flat list — for easy searching
 	Errors []Diagnostic
@@ -56,7 +57,7 @@ func rangeSize(r Range) int {
 }
 
 // simple helper function to see if p is in r
-func rangeContains(r Range, p Position) bool {
+func RangeContains(r Range, p Position) bool {
 	// before start line, or after end line
 	if p.Line < r.Start.Line || p.Line > r.End.Line {
 		return false
@@ -77,7 +78,7 @@ func (d *Document) NodeAt(pos Position) *Node {
 	var noi *Node
 	for _, node := range d.All {
 		// if the position is in the range
-		if rangeContains(node.Range, pos) {
+		if RangeContains(node.Range, pos) {
 			// as noi is already having the pos and node is also having the pos
 			// i.e, if node is in noi, then the rangesize of node must be less than noi
 			if noi == nil || rangeSize(node.Range) < rangeSize(noi.Range) {
@@ -98,7 +99,7 @@ func (d *Document) AttrAt(pos Position) (*Node, *Attribute) {
 	// pos can only be on one attr
 	for i := range noi.Attrs {
 		attr := &noi.Attrs[i] // pointer into the actual slice
-		if rangeContains(attr.NameRange, pos) || rangeContains(attr.ValueRange, pos) {
+		if RangeContains(attr.NameRange, pos) || RangeContains(attr.ValueRange, pos) {
 			return noi, attr
 		}
 	}
