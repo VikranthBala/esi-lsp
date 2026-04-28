@@ -1,0 +1,44 @@
+{
+  "name": "akamai-esi-lsp",
+  "displayName": "Akamai ESI Language Support",
+  "description": "Language support for Akamai ESI (Edge Side Includes)",
+  "version": "0.1.0",
+  "engines": {
+    "vscode": "^1.75.0"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "activationEvents": [
+    "onLanguage:html",
+    "onLanguage:esi"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "languages": [
+      {
+        "id": "esi",
+        "aliases": [
+          "ESI",
+          "esi"
+        ],
+        "extensions": [
+          ".esi"
+        ],
+        "configuration": "./language-configuration.json"
+      }
+    ]
+  },
+  "scripts": {
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./"
+  },
+  "dependencies": {
+    "vscode-languageclient": "^9.0.1"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.75.0",
+    "@types/node": "^18.0.0",
+    "typescript": "^5.0.0"
+  }
+}

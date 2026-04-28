@@ -1,0 +1,10 @@
+{
+  "comments": {
+    "blockComment": ["<esi:comment text=\"", "\" />"]
+  },
+  "brackets": [["<", ">"]],
+  "autoClosingPairs": [
+    { "open": "<", "close": ">" },
+    { "open": "\"", "close": "\"" }
+  ]
+}

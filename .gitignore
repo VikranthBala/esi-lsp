@@ -1,2 +1,19 @@
 tools/.venv/
 internal/parser/runtest/
+
+# Go binary
+esi-lsp
+esi-lsp.exe
+dist/
+
+# VS Code extension build output
+vscode-extension/out/
+vscode-extension/node_modules/
+
+# Generated files (regenerate with make gen)
+# internal/analyzer/rules_gen.go  ← keep this committed actually
+
+# Python tooling
+__pycache__/
+*.pyc
+tools/gen_tags/tags.json
