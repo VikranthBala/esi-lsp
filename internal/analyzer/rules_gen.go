@@ -60,7 +60,7 @@ var TagRules = map[parser.NodeKind]TagMeta{
 	},
 	"esi:include": {
 		RequiredAttrs: []string{"src"},
-		AllowedAttrs:  []string{"alt", "dcab", "onerror", "maxwait", "ttl"},
+		AllowedAttrs:  []string{"src", "alt", "dcab", "onerror", "maxwait", "ttl"},
 		Summary:       "Statement to include external objects",
 		AttrDocs: map[string]string{
 			"src":     "primary object to fetch",

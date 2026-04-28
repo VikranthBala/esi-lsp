@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+  <esi:include src="a13" alt="/header.html" />
+
+  <esi:choose>
+    <esi:when test="$(HTTP_COOKIE{user}) == 'yes'">
+      <p>Welcome back!</p>
+    </esi:when>
+    <esi:otherwise>
+      <p>Please log in.</p>
+    </esi:otherwise>
+  </esi:choose>
+
+  <esi:include src="promo" />
+
+  <esi:inline name="promo" fetchable="yes">
+    <div class="promo">Special offer!</div>
+  </esi:inline>
+
+</body>
+</html>

@@ -2,15 +2,14 @@ package parser
 
 type NodeKind string // represents the tag name like "esi:include"
 
-type Position struct {
-	Line      int // represent the line number
-	Character int // represents the character at, start from the left
+type Range struct {
+	Start Position `json:"start"`
+	End   Position `json:"end"`
 }
 
-// range for what is the start line, character, and end line and character
-type Range struct {
-	Start Position
-	End   Position
+type Position struct {
+	Line      int `json:"line"`
+	Character int `json:"character"`
 }
 
 // represents one attribute on a tag

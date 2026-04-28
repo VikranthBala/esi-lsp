@@ -120,6 +120,11 @@ def main():
         else:
             print(f"  ✗ failed after retries")
 
+    for tag, data in results.items():
+        for req in data.get("requiredAttrs", []):
+            if req not in data.get("allowedAttrs", []):
+                data["allowedAttrs"].append(req)
+
     with open("tags.json", "w") as f:
         json.dump(results, f, indent=2)
 

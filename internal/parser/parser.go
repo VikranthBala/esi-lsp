@@ -130,6 +130,9 @@ func (p *parser) extractFragment(startOffset int) (string, int) {
 // findNext finds the next occurrence of substr in p.source starting at from.
 // Returns the absolute offset, or -1 if not found.
 func (p *parser) findNext(from int, substr string) int {
+	if from >= len(p.source) {
+		return -1
+	}
 	idx := strings.Index(p.source[from:], substr)
 	if idx < 0 {
 		return -1
@@ -207,7 +210,14 @@ func (p *parser) tokenize(fragment string, baseOffset int) []*Node {
 
 			// find this tag's position in source
 			tagStart := p.findNext(cursor, "<esi:"+t.Name.Local)
-			tagEnd := p.findNext(tagStart, ">") + 1
+			if tagStart < 0 {
+				continue // can't find tag in source — skip
+			}
+			tagEnd := p.findNext(tagStart, ">")
+			if tagEnd < 0 {
+				continue
+			}
+			tagEnd += 1 // past the '>'
 
 			node := &Node{
 				Kind:      kind,
@@ -244,7 +254,14 @@ func (p *parser) tokenize(fragment string, baseOffset int) []*Node {
 
 			// find closing tag position
 			closeStart := p.findNext(cursor, "</esi:"+t.Name.Local)
-			closeEnd := p.findNext(closeStart, ">") + 1
+			if closeStart < 0 {
+				continue
+			}
+			closeEnd := p.findNext(closeStart, ">")
+			if closeEnd < 0 {
+				continue
+			}
+			closeEnd += 1
 
 			node.CloseRange = p.offsetToRange(closeStart, closeEnd)
 			node.Range = Range{
